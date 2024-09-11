@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'assets/img/apple-icon.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'assets/img/favicon.png' %}">
+    <title>
+      Argon Dashboard 2 by Creative Tim
+    </title>
+    <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <!-- CSS Files -->
+    <link id="pagestyle" href="{% static 'assets/css/argon-dashboard.css' %}?v=2.0.4" rel="stylesheet" />
+    <style>
+        .invoice-container {
+            max-width: 800px; /* Limite la largeur de la facture */
+            margin: 0 auto; /* Centre le conteneur */
+            padding: 20px;
+        }
+    </style>
+    
+
+</head>
+
+<body>
+    <div class="invoice-container">
+        <div class="card mb-4">
+            <div class="card-header pb-0">
+                <h3>Facture</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Facture Header -->
+                    <div class="col-6">
+                        
+                        Tunis</p>
+                    </div>
+                    <div class="col-6 text-end">
+                        <img alt="Logo" class="img-fluid" style="max-width: 150px;" src="{% static 'images/logotopnet.png' %}">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <!-- Facturé À -->
+                    <div class="col-6">
+                        <h6>FACTURÉ À</h6>
+                        <p>{{ invoice.contract }}<br>
+                        
+                    </div>
+                    <div class="col-6 text-end">
+                        <p>
+                            <strong>N° de facture:</strong> {{ invoice.numero_facture }}<br>
+                            <strong>Date:</strong> {{ today_date | date:"d/m/Y" }}<br>
+                            <strong>Date d'échéance:</strong> {{ invoice.date_echeance }}
+                        </p>
+                        
+                    </div>
+                </div>
+
+                <!-- Invoice Items Table -->
+                <div class="table-responsive mt-4">
+                    <table class="table align-items-center">
+                        <thead>
+                            <tr>
+                                <th>Notes</th>
+                                <th>Service Description</th>
+                                <th>Montant</th>
+                                <th>TVA Montant</th>
+                                <th>Total Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ invoice.notes }}</td>
+                                <td>{{ invoice.service_description }}</td>
+                                <td>{{ invoice.montant }}</td>
+                                <td>{{ invoice.tva_montant }}</td>
+                                <td>{{ invoice.total_montant }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Total Section -->
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <h6>Remarques</h6>
+                        <p>{{ invoice.notes }}</p>
+                    </div>
+                    <div class="col-6 text-end">
+                        <p>Sous-total HT: {{ invoice.montant }} DT<br>
+                        TVQ: {{ invoice.tva_montant }} DT<br>
+                        <strong>Total TTC: {{ invoice.total_montant }} DT</strong><br>
+                        Paiement(s): 0.00 DT<br>
+                        <strong>Solde à payer: {{ invoice.total_montant }} DT</strong></p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'download_invoice' invoice.id %}" class="btn btn-primary btn-sm">Download</a>
+                    <a href="{% url 'list_invoice' %}" class="btn btn-secondary btn-sm ms-2">Retour en arrière</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+  
+    <!--   Core JS Files   -->
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script>
+        var win = navigator.platform.indexOf('Win') > -1;
+        if (win && document.querySelector('#sidenav-scrollbar')) {
+            var options = {
+                damping: '0.5'
+            }
+            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        }
+    </script>
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+</body>
+</html>
+

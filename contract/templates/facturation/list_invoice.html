@@ -1,0 +1,261 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'assets/img/apple-icon.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'assets/img/favicon.png' %}">
+    <title>
+      Argon Dashboard 2 by Creative Tim
+    </title>
+    <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+   
+
+    
+    <!-- CSS Files -->
+    <link id="pagestyle" href="{% static 'assets/css/argon-dashboard.css' %}?v=2.0.4" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+   
+    <!-- Include Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  </head>
+
+  <body class="g-sidenav-show   bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href="{% url 'index' %}">
+        <img src="{% static 'images/logotopnet.png' %}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold">Revendeur Dashboard</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'index' %}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="{% url 'list_contract' %}">
+              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-collection text-info text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Gestion des contrats</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'list_invoice' %}" >
+              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+              </div>
+              <span class="nav-link-text ms-1">Gestion des factures</span>
+            </a>
+          </li>
+        
+       
+        
+      </ul>
+    </div>
+    
+  </aside>
+  <main class="main-content position-relative border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+        <div class="container-fluid py-1 px-3">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+           
+              <li class="breadcrumb-item text-sm text-white active" aria-current="page"> Dashboard</li>
+            </ol>
+            <h6 class="font-weight-bolder text-white mb-0">Revendeur Dashboard</h6>
+          </nav>
+          <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+              
+            </div>
+            <ul class="navbar-nav justify-content-end">
+              <li class="nav-item d-flex align-items-center">
+                <a href="javascript:;" class="nav-link text-white font-weight-bold px-0 d-flex align-items-center">
+                  <i class="fa fa-user me-sm-1"></i>
+                  <span class="me-2">{{ user.username }} </span>
+                </a>
+                <div>
+                  {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-success btn-sm ms-2">Se déconnecter</button>
+                    </form>
+                  {% endif %}
+                  </div>
+                  <span class="d-sm-inline d-none"></span>
+                </a>
+              </li>
+              
+             
+               
+                 
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    <!-- End Navbar -->
+  <!-- End Navbar -->
+<div class="container-fluid py-4">
+  
+      
+ 
+
+             
+          
+                      
+                    
+                  
+                        
+                  
+                        
+                  
+              
+           
+              <div class="row">
+                <div class="col-md-12 mt-0"> 
+                    <div class="card">
+                      <div class="card-header pb-0 px-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Les factures</h6>
+                        <a href="{% url 'add_invoice' %}" class="btn btn-outline-primary btn-sm mb-0">Ajouter facture</a>
+                    </div>
+                      
+                        <div class="card-body pt-4 p-3">
+                            <ul class="list-group">
+                                {% for invoice in invoices %}
+                                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+                                    <div class="d-flex flex-column">
+                                        <h6 class="mb-3 text-sm">{{ invoice.contract}}</h6>
+                                        <span class="mb-2 text-xs">Date d'échéance: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.date_echeance }}</span></span>
+                                        <span class="mb-2 text-xs">Numéro de facture: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.numero_facture }}</span></span>
+                                        <span class="text-xs">Montant total: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.total_montant }} DT</span></span>
+                                    </div>
+                                    <div class="ms-auto text-end">
+                                      <a href="#" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="confirmDelete('{{ invoice.id }}')">
+                                        <i class="far fa-trash-alt me-2"></i>Delete
+                                    </a>
+                                    
+                                    <form id="delete-form-{{ invoice.id }}" action="{% url 'delete_invoice' invoice.id %}" method="post" style="display:none;">
+                                        {% csrf_token %}
+                                    </form>
+                                    
+                                        <a class="btn btn-link text-dark px-3 mb-0" href="{% url 'update_invoice' invoice.id %}">
+                                            <i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit
+                                        </a>
+
+                                        <div class="d-flex align-items-center text-sm">
+                                          <a href="{% url 'view_invoice' invoice.id %}" class="btn btn-success btn-sm ms-auto">PDF</a>
+                                      </div>
+                                       
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+                  </div>
+                </div>
+              </div>
+      
+      <footer class="footer pt-3  ">
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6 mb-lg-0 mb-4">
+              <div class="copyright text-center text-sm text-muted text-lg-start">
+                © <script>
+                  document.write(new Date().getFullYear())
+                </script>,
+                made by
+                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Topnet</a>
+                
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+  
+
+  <!-- Github buttons -->
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const montantInput = document.getElementById('id_montant');
+        const tauxTvaInput = document.getElementById('id_taux_tva');
+        const tvaMontantInput = document.getElementById('id_tva_montant');
+        const totalMontantInput = document.getElementById('id_total_montant');
+
+        function calculateTotals() {
+            const montant = parseFloat(montantInput.value) || 0;
+            const tauxTva = parseFloat(tauxTvaInput.value) || 0.19;
+
+            const tvaMontant = montant * tauxTva;
+            const totalMontant = montant + tvaMontant;
+
+            tvaMontantInput.value = tvaMontant.toFixed(2);
+            totalMontantInput.value = totalMontant.toFixed(2);
+        }
+
+        montantInput.addEventListener('input', calculateTotals);
+        tauxTvaInput.addEventListener('input', calculateTotals);
+
+        // Initial calculation
+        calculateTotals();
+    });
+</script>
+
+<script>
+  function confirmDelete(invoiceId) {
+      Swal.fire({
+          title: 'Êtes-vous sûr de supprimer cette facture ?',
+          text: "Vous ne pourrez pas revenir en arrière !",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Oui, supprimer !',
+          cancelButtonText: 'Annuler'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              document.getElementById('delete-form-' + invoiceId).submit();
+          }
+      })
+  }
+  </script>
+  
+</body>
+
+</html>

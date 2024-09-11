@@ -1,0 +1,797 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Contract</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+
+    <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <!-- CSS Files -->
+    <link id="pagestyle" href="{% static 'assets/css/argon-dashboard.css' %}?v=2.0.4" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+   
+    <!-- Include Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fonction de validation supprimée pour les coordonnées
+            // function validateCoordonnees() {
+            //     var coordonnees = $('#id_coordonnees').val();
+            //     var regex = /^\d{1,2}\.\d{5},\d{1,2}\.\d{5}$/;
+            //     if (regex.test(coordonnees)) {
+            //         $('#id_coordonnees').removeClass('is-invalid').addClass('is-valid');
+            //         $('#coordonnees_feedback').hide();
+            //     } else {
+            //         $('#id_coordonnees').removeClass('is-valid').addClass('is-invalid');
+            //         $('#coordonnees_feedback').show();
+            //     }
+            // }
+    
+            // $('#id_coordonnees').on('input', function() {
+            //     validateCoordonnees();
+            // });
+    
+            // Initial validation call removed
+            // validateCoordonnees();
+        });
+    </script>
+    
+    <script>
+        $(document).ready(function() {
+            function validateNumeroPieceIdentite() {
+                var type = $('#id_type_piece_identite').val();
+                var numero = $('#id_numero_piece_identite').val();
+                var regex = type === 'CIN' ? /^\d{8}$/ : /^[a-zA-Z]\d{6}$/;
+                var chiffres = new RegExp("[0-9]");
+                var lettres = new RegExp("[a-zA-Z]");
+                var valid = true;
+    
+                if (type === 'CIN') {
+                    for (var x = 0; x < numero.length; x++) {
+                        if (!chiffres.test(numero.charAt(x))) {
+                            $('#id_numero_piece_identite').val(numero.substr(0, x) + numero.substr(x + 1));
+                            valid = false;
+                        }
+                    }
+                } else if (type === 'Passport') {
+                    for (var x = 0; x < numero.length; x++) {
+                        if (x === 0 && !lettres.test(numero.charAt(x))) {
+                            $('#id_numero_piece_identite').val(numero.substr(0, x) + numero.substr(x + 1));
+                            valid = false;
+                        } else if (x > 0 && !chiffres.test(numero.charAt(x))) {
+                            $('#id_numero_piece_identite').val(numero.substr(0, x) + numero.substr(x + 1));
+                            valid = false;
+                        }
+                    }
+                }
+    
+                if (regex.test(numero)) {
+                    $('#id_numero_piece_identite').removeClass('is-invalid').addClass('is-valid');
+                    $('#numero_piece_identite_feedback').hide();
+                } else {
+                    $('#id_numero_piece_identite').removeClass('is-valid').addClass('is-invalid');
+                    $('#numero_piece_identite_feedback').show();
+                }
+            }
+    
+            $('#id_type_piece_identite').change(function() {
+                validateNumeroPieceIdentite();
+            });
+    
+            $('#id_numero_piece_identite').on('input', function() {
+                validateNumeroPieceIdentite();
+            });
+    
+            // Initial validation call on page load
+            validateNumeroPieceIdentite();
+        });
+    </script>
+    
+    <script>
+        $(document).ready(function(){
+            $('#id_date_naissance').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayHighlight: true
+            });
+        });
+    
+        function calculateAge(birthdate) {
+            const today = new Date();
+            const birthDate = new Date(birthdate);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+    
+        function validateField(field) {
+            let error = false;
+            let errorMessage = '';
+    
+            if (field.tagName.toLowerCase() === 'select') {
+                if (field.selectedIndex === 0 || !field.value) {
+                    error = true;
+                    errorMessage = 'Ce champ est obligatoire.';
+                }
+            } else if (field.id === 'id_telephone_contact' || field.id === 'id_gsm_contact' || field.id === 'id_gsm_contact_2') {
+                if (field.value.trim().length !== 8 || !/^\d{8}$/.test(field.value.trim())) {
+                    error = true;
+                    errorMessage = 'Le numéro de téléphone doit contenir exactement 8 chiffres.';
+                }
+            } else if (field.id === 'id_nom' || field.id === 'id_prenom') {
+                if (!/^[a-zA-Zéèêëàâäîïôöûüç]+$/.test(field.value.trim())) {
+                    error = true;
+                    errorMessage = 'Le nom et le prénom ne doivent contenir que des lettres et des caractères accentués.';
+                }
+            } else if (field.id === 'id_date_naissance') {
+                const birthdate = field.value.trim();
+                const birthDate = new Date(birthdate);
+                const age = calculateAge(birthdate);
+                if (age < 18) {
+                    error = true;
+                    errorMessage = 'Vous devez avoir au moins 18 ans.';
+                } else if (birthDate.getFullYear() < 1930) {
+                    error = true;
+                    errorMessage = 'L\'année de naissance ne peut pas être antérieure ';
+                }
+            } else {
+                if (field.value.trim() === '') {
+                    error = true;
+                    errorMessage = 'Ce champ est obligatoire.';
+                }
+            }
+    
+            const errorSpan = field.nextElementSibling;
+            if (error) {
+                field.classList.remove('is-valid');
+                field.classList.add('is-invalid');
+                errorSpan.textContent = errorMessage;
+                errorSpan.style.display = 'block';
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                errorSpan.style.display = 'none';
+            }
+            return !error;
+        }
+    
+        function validateForm(event) {
+            var fields = document.querySelectorAll('input, select, textarea');
+            var isValid = true;
+    
+            fields.forEach(function(field) {
+                if (field.id !== 'id_code_postal' && field.id !== 'id_coordonnees') {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                }
+            });
+    
+            if (!isValid) {
+                event.preventDefault();
+                alert('Tous les champs doivent être remplis correctement.');
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            var form = document.querySelector('form');
+            form.addEventListener('submit', validateForm);
+    
+            var fields = document.querySelectorAll('input, select, textarea');
+            fields.forEach(function(field) {
+                var errorSpan = document.createElement('span');
+                errorSpan.className = 'invalid-feedback';
+                errorSpan.style.color = 'red';
+                errorSpan.style.display = 'none';
+                field.parentNode.insertBefore(errorSpan, field.nextSibling);
+    
+                field.addEventListener('input', function () {
+                    validateField(field);
+                });
+                field.addEventListener('change', function () {
+                    validateField(field);
+                });
+            });
+    
+            fields.forEach(function(field) {
+                if (field.id !== 'id_code_postal' && field.id !== 'id_coordonnees') {
+                    validateField(field);
+                }
+            });
+        });
+    </script>
+    
+</head>
+
+<body class="g-sidenav-show bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4" id="sidenav-main">
+        <div class="sidenav-header">
+            <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand m-0" href="{% url 'index' %}">
+                <img src="{% static 'images/logotopnet.png' %}" class="navbar-brand-img h-100" alt="main_logo">
+                <span class="ms-1 font-weight-bold">Revendeur Dashboard</span>
+            </a>
+        </div>
+        <hr class="horizontal dark mt-0">
+        <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'index' %}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'list_contract' %}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-collection text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Gestion des contrats</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'list_invoice' %}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Gestion des factures</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+  <main class="main-content position-relative border-radius-lg">
+      <!-- Navbar -->
+      <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
+          <div class="container-fluid py-1 px-3">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                      <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
+                      <li class="breadcrumb-item text-sm text-white active" aria-current="page">Dashboard</li>
+                  </ol>
+                  <h6 class="font-weight-bolder text-white mb-0">Revendeur Dashboard</h6>
+              </nav>
+              <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+                  <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
+                  <ul class="navbar-nav justify-content-end">
+                      <li class="nav-item d-flex align-items-center">
+                          <a href="javascript:;" class="nav-link text-white font-weight-bold px-0 d-flex align-items-center">
+                              <i class="fa fa-user me-sm-1"></i>
+                              <span class="me-2">{{ user.username }}</span>
+                          </a>
+                          <div>
+                              {% if user.is_authenticated %}
+                                  <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                                      {% csrf_token %}
+                                      <button type="submit" class="btn btn-success btn-sm ms-2">Se déconnecter</button>
+                                  </form>
+                              {% endif %}
+                          </div>
+                      </li>
+                      <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                          <a href="javascript:;" class="nav-link text-white p-0" id="iconNavbarSidenav">
+                              <div class="sidenav-toggler-inner">
+                                  <i class="sidenav-toggler-line bg-white"></i>
+                                  <i class="sidenav-toggler-line bg-white"></i>
+                                  <i class="sidenav-toggler-line bg-white"></i>
+                              </div>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </nav>
+      <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-md-8 offset-md-1"> <!-- Ajoute un décalage de 2 colonnes de chaque côté -->
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="d-flex align-items-center">
+                            <p class="mb-0">Ajout d'une nouvelle ligne ADSL SMART</p>
+                           
+                </div>
+              </div>
+              <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="type_abonnement">Type d'abonnement</label>
+                                <select id="type_abonnement" name="type_abonnement" class="form-control" required>
+                                    {% for choice in form.type_abonnement.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.type_abonnement.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="type_smart_fibre_group" style="display:none;">
+                            <div class="form-group">
+                                <label for="type_smart_fibre">Type Smart Fibre</label>
+                                <select id="type_smart_fibre" name="type_smart_fibre" class="form-control">
+                                    {% for choice in form.type_smart_fibre.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.type_smart_fibre.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="type_smart_rapido_group" style="display:none;">
+                            <div class="form-group">
+                                <label for="type_smart_rapido">Type Smart Rapido</label>
+                                <select id="type_smart_rapido" name="type_smart_rapido" class="form-control">
+                                    {% for choice in form.type_smart_rapido.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.type_smart_rapido.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="type_smart_adsl_group" style="display:none;">
+                            <div class="form-group">
+                                <label for="type_smart_adsl">Type Smart adsl</label>
+                                <select id="type_smart_adsl" name="type_smart_adsl" class="form-control">
+                                    {% for choice in form.type_smart_adsl.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.type_smart_adsl.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="col-md-6">
+                            <div class="form-group" id="type_smart_fibre_group" style="display:none;">
+                                <label for="type_smart_fibre">Type Smart fibre</label>
+                                <select id="type_smart_fibre" name="type_smart_fibre" class="form-control">
+                                    {% for choice in form.type_smart_fibre.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.type_smart_fibre.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="gouvernorat" class="form-control-label">Gouvernorat</label>
+                                <select class="form-control" name="gouvernorat" id="id_gouvernorat">
+                                    <option disabled selected>---------</option>
+                                    {% for choice in form.gouvernorat.field.choices %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="delegation" class="form-control-label">Delegation</label>
+                                <select class="form-control" name="delegation" id="id_delegation">
+                                    <option disabled selected>---------</option>
+                                    {% for choice in form.delegation.field.choices %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="localite" class="form-control-label">Localité</label>
+                                <select class="form-control" name="localite" id="id_localite">
+                                    <option disabled selected>---------</option>
+                                    {% for choice in form.localite.field.choices %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group{% if form.ville.errors %} has-danger{% else %} has-success{% endif %}">
+                                <label for="id_ville" class="form-control-label">Ville</label>
+                                <input type="text" name="ville" id="id_ville" class="form-control{% if form.ville.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.ville.value|default_if_none:'' }}">
+                                {% if form.ville.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.ville.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="code_postal" class="form-control-label">Code postal</label>
+                                <input class="form-control" type="number" name="code_postal" id="id_code_postal">
+                                <span class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="civilite" class="form-control-label">Civilité</label>
+                                <select class="form-control" name="civilite" id="id_civilite">
+                                    <option disabled selected>Sélectionnez la civilité</option>
+                                    {% for choice in form.civilite.field.choices %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.nom.id_for_label }}">Nom</label>
+                                {{ form.nom }}
+                                {% for error in form.nom.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.prenom.id_for_label }}">Prénom</label>
+                                {{ form.prenom }}
+                                {% for error in form.prenom.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.date_naissance.id_for_label }}">Date de naissance</label>
+                                {{ form.date_naissance }}
+                                {% for error in form.date_naissance.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.lieu_naissance.id_for_label }}">Lieu de naissance</label>
+                                {{ form.lieu_naissance }}
+                                {% for error in form.lieu_naissance.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="type_piece_identite" class="form-control-label">Type de pièce d'identité</label>
+                                <select class="form-control" name="type_piece_identite" id="id_type_piece_identite">
+                                    <option disabled selected>Sélectionnez le type de pièce d'identité</option>
+                                    {% for choice in form.type_piece_identite.field.choices %}
+                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="numero_piece_identite" class="form-control-label">Numéro de pièce d'identité</label>
+                                <input class="form-control" type="text" name="numero_piece_identite" id="id_numero_piece_identite">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group{% if form.telephone_contact.errors %} has-danger{% else %} has-success{% endif %}">
+                                <label for="id_telephone_contact" class="form-control-label">Téléphone contact</label>
+                                <input type="number" name="telephone_contact" id="id_telephone_contact" class="form-control{% if form.telephone_contact.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.telephone_contact.value|default_if_none:'' }}">
+                                {% if form.telephone_contact.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.telephone_contact.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group{% if form.gsm_contact.errors %} has-danger{% else %} has-success{% endif %}">
+                                <label for="id_gsm_contact" class="form-control-label">GSM de contact</label>
+                                <input type="number" name="gsm_contact" id="id_gsm_contact" class="form-control{% if form.gsm_contact.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.gsm_contact.value|default_if_none:'' }}">
+                                {% if form.gsm_contact.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.gsm_contact.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="gsm_contact_2" class="form-control-label">GSM de contact 2</label>
+                                <input class="form-control" type="number" name="gsm_contact_2" id="id_gsm_contact_2">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="adresse_installation" class="form-control-label">Adresse d'installation</label>
+                                <textarea class="form-control" name="adresse_installation" id="id_adresse_installation" rows="3" placeholder="Adresse d'installation"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="coordonnees" class="form-control-label">Coordonnées</label>
+                                <input class="form-control" type="text" name="coordonnees" id="id_coordonnees">
+                                <span id="coordonnees_feedback" class="invalid-feedback" style="display:none; color: red;">Les coordonnées doivent être au format "10.12502,36.82574".</span>
+                              </div>
+                            
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.cin_recto.id_for_label }}">CIN Recto</label>
+                                {{ form.cin_recto }}
+                                {% for error in form.cin_recto.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.cin_verso.id_for_label }}">CIN Verso</label>
+                                {{ form.cin_verso }}
+                                {% for error in form.cin_verso.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.contrat_tt.id_for_label }}">Contrat TT</label>
+                                {{ form.contrat_tt }}
+                                {% for error in form.contrat_tt.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.contrat_topnet.id_for_label }}">Contrat Topnet</label>
+                                {{ form.contrat_topnet }}
+                                {% for error in form.contrat_topnet.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.contrat_general_vente.id_for_label }}">Contrat Général de Vente</label>
+                                {{ form.contrat_general_vente }}
+                                {% for error in form.contrat_general_vente.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <hr class="horizontal dark">
+                        <p class="text-uppercase text-sm">Informations de paiement</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="frequence_paiement" class="form-control-label">Fréquence de paiement</label>
+                                    {{ form.frequence_paiement }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+</div>
+<footer class="footer pt-3  ">
+  <div class="container-fluid">
+      <div class="row align-items-center justify-content-lg-between">
+          <div class="col-lg-6 mb-lg-0 mb-4">
+              <div class="copyright text-center text-sm text-muted text-lg-start">
+                  © <script>
+                      document.write(new Date().getFullYear())
+                  </script>,
+                  made with <i class="fa fa-heart"></i> by
+                  <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>
+                  for a better web.
+              </div>
+          </div>
+          <div class="col-lg-6">
+              <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+                  <li class="nav-item">
+                      <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted" target="_blank">About Us</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="http://blog.creative-tim.com" class="nav-link text-muted" target="_blank">Blog</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+</footer>
+</div>
+</main>
+<script>
+    $(document).ready(function() {
+        function toggleSmartOptions() {
+            if ($('#type_abonnement').val() === 'SMART FIBRE') {
+                $('#type_smart_fibre_group').show();
+            } else {
+                $('#type_smart_fibre_group').hide();
+            }
+            
+            if ($('#type_abonnement').val() === 'SMART RAPIDO') {
+                $('#type_smart_rapido_group').show();
+            } else {
+                $('#type_smart_rapido_group').hide();
+            }
+            if ($('#type_abonnement').val() === 'SMART ADSL') {
+                $('#type_smart_adsl_group').show();
+            } else {
+                $('#type_smart_adsl_group').hide();
+            }
+        }
+
+        $('#type_abonnement').change(function() {
+            toggleSmartOptions();
+        });
+
+        toggleSmartOptions();
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#id_gouvernorat').change(function() {
+            var gouvernoratId = $(this).val();
+            console.log('Gouvernorat ID:', gouvernoratId);
+            if (gouvernoratId) {
+                $.ajax({
+                    url: '{% url "ajax_load_delegations" %}',
+                    data: {
+                        'gouvernorat_id': gouvernoratId
+                    },
+                    success: function(data) {
+                        console.log('Delegations:', data);
+                        $('#id_delegation').html('<option value="">Sélectionner une délégation</option>');
+                        $('#id_localite').html('<option value="">Sélectionner une localité</option>');
+                        $.each(data, function(key, value) {
+                            $('#id_delegation').append('<option value="' + value.id + '">' + value.nomDelegation + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#id_delegation').html('<option value="">Sélectionner une délégation</option>');
+                $('#id_localite').html('<option value="">Sélectionner une localité</option>');
+            }
+        });
+
+        $('#id_delegation').change(function() {
+            var delegationId = $(this).val();
+            console.log('Delegation ID:', delegationId);
+            if (delegationId) {
+                $.ajax({
+                    url: '{% url "ajax_load_localites" %}',
+                    data: {
+                        'delegation_id': delegationId
+                    },
+                    success: function(data) {
+                        console.log('Localites:', data);
+                        $('#id_localite').html('<option value="">Sélectionner une localité</option>');
+                        $.each(data, function(key, value) {
+                            $('#id_localite').append('<option value="' + value.id + '">' + value.nomLocalite + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#id_localite').html('<option value="">Sélectionner une localité</option>');
+            }
+        });
+
+        $('#id_localite').change(function() {
+            var localiteId = $(this).val();
+            console.log('Localite ID:', localiteId);
+            if (localiteId) {
+                $.ajax({
+                    url: '{% url "ajax_load_code_postal" %}',
+                    data: {
+                        'localite_id': localiteId
+                    },
+                    success: function(data) {
+                        console.log('Code Postal:', data);
+                        if (data.code_postal) {
+                            $('#id_code_postal').val(data.code_postal);
+                        } else {
+                            alert('Code postal non trouvé.');
+                        }
+                    }
+                });
+            } else {
+                $('#id_code_postal').val('');
+            }
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#id_localite').change(function() {
+            var localiteId = $(this).val();
+            console.log('Localite ID:', localiteId);  // Debug
+            if (localiteId) {
+                $.ajax({
+                    url: '{% url "get_coordinates" %}',
+                    data: {
+                        'localite_id': localiteId
+                    },
+                    success: function(data) {
+                        console.log('Coordinates data:', data);  // Debug
+                        if (data.lat && data.lon) {
+                            var coordonnees = data.lat + ',' + data.lon;
+                            $('#id_coordonnees').val(coordonnees);
+                            $('#id_coordonnees').removeClass('is-invalid').addClass('is-valid');
+                            $('#coordonnees_feedback').hide();
+                        } else {
+                            alert('Impossible de récupérer les coordonnées pour cette localité.');
+                            $('#id_coordonnees').removeClass('is-valid').addClass('is-invalid');
+                            $('#coordonnees_feedback').show();
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('AJAX Error:', textStatus, errorThrown);  // Debug
+                        $('#id_coordonnees').removeClass('is-valid').addClass('is-invalid');
+                        $('#coordonnees_feedback').show();
+                    }
+                });
+            } else {
+                $('#id_coordonnees').val('');
+                $('#id_coordonnees').removeClass('is-valid').addClass('is-invalid');
+                $('#coordonnees_feedback').show();
+            }
+        });
+    });
+</script>
+
+
+
+
+    
+</body>
+</html>
