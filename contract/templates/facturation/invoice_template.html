@@ -98,12 +98,20 @@
                     </div>
                     <div class="col-6 text-end">
                         <p>Sous-total HT: {{ invoice.montant }} DT<br>
-                        TVQ: {{ invoice.tva_montant }} DT<br>
+                        TVA: {{ invoice.tva_montant }} DT<br>
                         <strong>Total TTC: {{ invoice.total_montant }} DT</strong><br>
-                        Paiement(s): 0.00 DT<br>
-                        <strong>Solde à payer: {{ invoice.total_montant }} DT</strong></p>
+                        {% if invoice.status_paiement == 'paid' %}
+                            Paiement(s): {{ invoice.total_montant }} DT<br>
+                            <strong>Solde à payer: 0.00 DT</strong><br>
+                            <strong style="color: red;">Payé</strong>
+                        {% else %}
+                            Paiement(s): 0.00 DT<br>
+                            <strong>Solde à payer: {{ invoice.total_montant }} DT</strong>
+                        {% endif %}
+                        </p>
                     </div>
                 </div>
+                
                 <div class="d-flex justify-content-end">
                     <a href="{% url 'download_invoice' invoice.id %}" class="btn btn-primary btn-sm">Download</a>
                     <a href="{% url 'list_invoice' %}" class="btn btn-secondary btn-sm ms-2">Retour en arrière</a>

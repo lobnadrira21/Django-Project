@@ -140,57 +140,50 @@
               
                 <form method="post" action="{% url 'add_invoice' %}">
                   {% csrf_token %}
+                  {% if form.non_field_errors %}
+                  <div class="alert alert-danger">
+                      {{ form.non_field_errors }}
+                  </div>
+              {% endif %}
                   
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group{% if form.contract.errors %} has-danger{% endif %}">
-                              <label for="id_contract" class="form-control-label">Contrat</label>
-                              <select class="form-control{% if form.contract.errors %} is-invalid{% endif %}" name="contract" id="id_contract" >
-                                <option disabled selected>Sélectionnez le contrat</option>
-                                {% for choice in form.contract.field.choices %}
-                                    <option value="{{ choice.0 }}" {% if form.contract.value == choice.0 %}selected{% endif %}>
-                                        {{ choice.1 }}
-                                    </option>
+              <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group{% if form.contract.errors %} has-danger{% endif %}">
+                        <label for="id_contract" class="form-control-label">Contrat</label>
+                        <select class="form-control{% if form.contract.errors %} is-invalid{% endif %}" name="contract" id="id_contract">
+                            <option disabled selected>Sélectionnez le contrat</option>
+                            {% for choice in form.contract.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.contract.value == choice.0 %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.contract.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.contract.errors %}
+                                    {{ error }}
                                 {% endfor %}
-                            </select>
-                            
-                              {% if form.contract.errors %}
-                                  <div class="invalid-feedback">
-                                      {% for error in form.contract.errors %}
-                                          {{ error }}
-                                      {% endfor %}
-                                  </div>
-                              {% endif %}
-                          </div>
-                      </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                      
                       
 
-                          <div class="col-md-6">
-                            <div class="form-group{% if form.numero_facture.errors %} has-danger{% else %} has-success{% endif %}">
-                                <label for="id_numero_facture" class="form-control-label">numero facture</label>
-                                <input type="number" name="numero_facture" id="id_numero_facture" class="form-control{% if form.numero_facture.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.numero_facture.value|default_if_none:'' }}">
-                                {% if form.numero_facture.errors %}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.numero_facture.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            </div>
-                            <div class="col-md-6">
-                              <div class="form-group{% if form.date_echeance.errors %} has-danger{% else %} has-success{% endif %}">
-                                  <label for="id_date_echeance" class="form-control-label">Date d'échéance</label>
-                                  <input type="date" name="date_echeance" id="id_date_echeance" class="form-control{% if form.date_echeance.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.date_echeance.value|default_if_none:'' }}">
-                                  {% if form.date_echeance.errors %}
-                                      <div class="invalid-feedback">
-                                          {% for error in form.date_echeance.errors %}
-                                              {{ error }}
-                                          {% endfor %}
-                                      </div>
-                                  {% endif %}
-                              </div>
-                            </div>
+                       
+                <div class="col-md-6">
+                  <div class="form-group{% if form.date_echeance.errors %} has-danger{% endif %}">
+                      <label for="id_date_echeance" class="form-control-label">Date d'échéance</label>
+                      <input type="date" name="date_echeance" id="id_date_echeance" class="form-control{% if form.date_echeance.errors %} is-invalid{% endif %}" value="{{ form.date_echeance.value|default_if_none:'' }}">
+                      {% if form.date_echeance.errors %}
+                          <div class="invalid-feedback">
+                              {% for error in form.date_echeance.errors %}
+                                  {{ error }}
+                              {% endfor %}
+                          </div>
+                      {% endif %}
+                  </div>
+              </div>
                               <div class="col-md-6">
                                 <div class="form-group{% if form.service_description.errors %} has-danger{% else %} has-success{% endif %}">
                                     <label for="id_service_description" class="form-control-label">Service Description</label>
@@ -216,100 +209,93 @@
                                           </div>
                                       {% endif %}
                                   </div>
-                                </div>
+                              </div>
                         
                           
-                                <div class="col-md-6">
-                                  <div class="form-group{% if form.taux_tva.errors %} has-danger{% else %} has-success{% endif %}">
-                                      <label for="id_taux_tva" class="form-control-label">Taux TVA</label>
-                                      <input type="number" name="taux_tva" id="id_taux_tva" class="form-control{% if form.taux_tva.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.taux_tva.value|default_if_none:'0.19' }}" readonly placeholder="0.19">
-                                      {% if form.taux_tva.errors %}
-                                          <div class="invalid-feedback">
-                                              {% for error in form.taux_tva.errors %}
-                                                  {{ error }}
-                                              {% endfor %}
-                                          </div>
-                                      {% endif %}
-                                  </div>
+                              <div class="col-md-6">
+                                <div class="form-group{% if form.taux_tva.errors %} has-danger{% else %} has-success{% endif %}">
+                                    <label for="id_taux_tva" class="form-control-label">Taux TVA</label>
+                                    <input type="number" name="taux_tva" id="id_taux_tva" class="form-control{% if form.taux_tva.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.taux_tva.value|default_if_none:'0.19' }}" readonly>
+                                    {% if form.taux_tva.errors %}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.taux_tva.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
+                            </div>
                                 
                                 
                                 
-                                <div class="col-md-6">
-                                  <div class="form-group{% if form.tva_montant.errors %} has-danger{% else %} has-success{% endif %}">
-                                      <label for="id_tva_montant" class="form-control-label">Montant TVA</label>
-                                      <input 
-                                          type="number" 
-                                          step="0.01" 
-                                          name="tva_montant" 
-                                          id="id_tva_montant" 
-                                          class="form-control{% if form.tva_montant.errors %} is-invalid{% else %} is-valid{% endif %}" 
-                                          value="{{ form.tva_montant.value|default_if_none:'' }}"
-                                      >
-                                      {% if form.tva_montant.errors %}
-                                          <div class="invalid-feedback">
-                                              {% for error in form.tva_montant.errors %}
-                                                  {{ error }}
-                                              {% endfor %}
-                                          </div>
-                                      {% endif %}
-                                  </div>
+                            <div class="col-md-6">
+                              <div class="form-group{% if form.tva_montant.errors %} has-danger{% else %} has-success{% endif %}">
+                                  <label for="id_tva_montant" class="form-control-label">Montant TVA</label>
+                                  <input type="number" step="0.01" name="tva_montant" id="id_tva_montant" class="form-control{% if form.tva_montant.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.tva_montant.value|default_if_none:'' }}">
+                                  {% if form.tva_montant.errors %}
+                                      <div class="invalid-feedback">
+                                          {% for error in form.tva_montant.errors %}
+                                              {{ error }}
+                                          {% endfor %}
+                                      </div>
+                                  {% endif %}
                               </div>
+                          </div>
                               
                               
-                                    <div class="col-md-6">
-                                      <div class="form-group{% if form.total_montant.errors %} has-danger{% else %} has-success{% endif %}">
-                                          <label for="id_total_montant" class="form-control-label">Montant total</label>
-                                          <input type="number" name="total_montant" id="id_total_montant" class="form-control" readonly>
-                                          {% if form.total_montant.errors %}
-                                              <div class="invalid-feedback">
-                                                  {% for error in form.total_montant.errors %}
-                                                      {{ error }}
-                                                  {% endfor %}
-                                              </div>
-                                          {% endif %}
-                                      </div>
-                                      </div>
+                          <div class="col-md-6">
+                            <div class="form-group{% if form.total_montant.errors %} has-danger{% else %} has-success{% endif %}">
+                                <label for="id_total_montant" class="form-control-label">Montant total</label>
+                                <input type="number" name="total_montant" id="id_total_montant" class="form-control" readonly>
+                                {% if form.total_montant.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.total_montant.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                          
                                       
-                                      <div class="col-md-6">
-                                        <div class="form-group{% if form.methode_paiement.errors %} has-danger{% endif %}">
-                                            <label for="id_methode_paiement" class="form-control-label">Méthode de paiement</label>
-                                            <select class="form-control{% if form.methode_paiement.errors %} is-invalid{% endif %}" name="methode_paiement" id="id_methode_paiement" >
-                                                <option disabled selected>Sélectionnez la méthode de paiement</option>
-                                                {% for choice in form.methode_paiement.field.choices %}
-                                                    <option value="{{ choice.0 }}" {% if form.methode_paiement.value == choice.0 %}selected{% endif %}>
-                                                        {{ choice.1 }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                            {% if form.methode_paiement.errors %}
-                                                <div class="invalid-feedback">
-                                                    {% for error in form.methode_paiement.errors %}
-                                                        {{ error }}
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                        <div class="col-md-6">
+                          <div class="form-group{% if form.methode_paiement.errors %} has-danger{% endif %}">
+                              <label for="id_methode_paiement" class="form-control-label">Méthode de paiement</label>
+                              <select class="form-control{% if form.methode_paiement.errors %} is-invalid{% endif %}" name="methode_paiement" id="id_methode_paiement">
+                                  <option disabled selected>Sélectionnez la méthode de paiement</option>
+                                  {% for choice in form.methode_paiement.field.choices %}
+                                      <option value="{{ choice.0 }}" {% if form.methode_paiement.value == choice.0 %}selected{% endif %}>
+                                          {{ choice.1 }}
+                                      </option>
+                                  {% endfor %}
+                              </select>
+                              {% if form.methode_paiement.errors %}
+                                  <div class="invalid-feedback">
+                                      {% for error in form.methode_paiement.errors %}
+                                          {{ error }}
+                                      {% endfor %}
+                                  </div>
+                              {% endif %}
+                          </div>
+                      </div>
                                     
                                     
                                    
                                   
                           
-                                    <div class="col-md-6">
-                                      <div class="form-group{% if form.notes.errors %} has-danger{% else %} has-success{% endif %}">
-                                          <label for="id_notes" class="form-control-label">Notes</label>
-                                          <input type="text" name="notes" id="id_notes" class="form-control{% if form.notes.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.notes.value|default_if_none:'' }}">
-                                          {% if form.notes.errors %}
-                                              <div class="invalid-feedback">
-                                                  {% for error in form.notes.errors %}
-                                                      {{ error }}
-                                                  {% endfor %}
-                                              </div>
-                                          {% endif %}
-                                      </div>
-                                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group{% if form.notes.errors %} has-danger{% else %} has-success{% endif %}">
+                            <label for="id_notes" class="form-control-label">Notes</label>
+                            <input type="text" name="notes" id="id_notes" class="form-control{% if form.notes.errors %} is-invalid{% else %} is-valid{% endif %}" value="{{ form.notes.value|default_if_none:'' }}">
+                            {% if form.notes.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.notes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                           
                       </div>
                       <div class="row">

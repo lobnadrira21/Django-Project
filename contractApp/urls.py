@@ -35,7 +35,7 @@ urlpatterns = [
     path('contract/add/', add_contract, name='add_contract'),
     path('contract/edit/', edit_contract, name='edit_contract'),
     path('contract/', include('contract.urls')),
-    path('contract/valid_contract',views.invoice_data_view, name='admin_list_contract' ),
+    path('contract/valid_contract',views.admin_dashboard, name='admin_list_contract' ),
     path('contract/card_valid_contract',card_contract, name='card_valid_contract' ),
     path('contract/view_contract', view_contract, name='view_contract'),
     path('contracts/view/<int:contract_id>/', view_contract_detail, name='details_contract'),

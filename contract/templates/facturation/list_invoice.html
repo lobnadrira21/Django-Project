@@ -126,7 +126,42 @@
 <div class="container-fluid py-4">
   
       
- 
+  <div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6>Recherche de facture</h6>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{% url 'list_invoice' %}" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="numero_facture" class="form-label">Numéro de facture</label>
+                        <input type="text" class="form-control" name="numero_facture" placeholder="Numéro de facture">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="contract" class="form-label">Nom du contrat</label>
+                        <input type="text" class="form-control" name="contract" placeholder="Nom du contrat">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_echeance" class="form-label">Date d'échéance</label>
+                        <input type="date" class="form-control" name="date_echeance">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status_paiement" class="form-label">Statut de paiement</label>
+                        <select class="form-control" name="status_paiement">
+                            <option value="">Sélectionner</option>
+                            <option value="paid">Payé</option>
+                            <option value="unpaid">Non payé</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
              
           
@@ -156,6 +191,7 @@
                                         <span class="mb-2 text-xs">Date d'échéance: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.date_echeance }}</span></span>
                                         <span class="mb-2 text-xs">Numéro de facture: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.numero_facture }}</span></span>
                                         <span class="text-xs">Montant total: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.total_montant }} DT</span></span>
+                                        <span class="text-xs">Status de paiement: <span class="text-dark font-weight-bold ms-sm-2">{{ invoice.status_paiement }} </span></span>
                                     </div>
                                     <div class="ms-auto text-end">
                                       <a href="#" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="confirmDelete('{{ invoice.id }}')">

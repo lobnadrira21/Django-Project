@@ -176,39 +176,35 @@
     </section>
 
     <div class="container-fluid py-4">
-      <!-- Button to show/hide the charts -->
       <button class="btn btn-success" id="toggleCharts">Voir les graphiques</button>
 
-      <!-- Charts container -->
       <div id="charts-container">
         <div class="row">
-          <!-- Graphique des factures créées par mois -->
           <div class="col-lg-6 mb-lg-0 mb-4">
             <div class="card">
-              <div class="card-body p-3">
-                <h2>Total des factures créées par mois {{ now|date:"Y" }}</h2>
-                <canvas id="invoiceAmountChart"></canvas>
-              </div>
+                <div class="card-body p-3">
+                    <h2>Total des factures créées et payées par mois {{ now|date:"Y" }}</h2>
+                    <canvas id="invoiceAmountChart"></canvas>
+                </div>
             </div>
-          </div>
-
-          <!-- Graphique des factures par client -->
-          <div class="col-lg-6 mb-lg-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <h2>Total du montant par client</h2>
-                <canvas id="invoiceByClientChart" style="width: 300px; height: 300px;"></canvas>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-
-    {{ labels|json_script:"invoice_labels" }}
-    {{ invoice_totals|json_script:"invoice_totals" }}
-    {{ client_labels|json_script:"client_labels" }}
-    {{ client_totals|json_script:"client_totals" }}
+        
+        <div class="col-lg-6 mb-lg-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <h2>Répartition des factures par statut de paiement</h2>
+                    <canvas id="paymentStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        {{ labels|json_script:"invoice_labels" }}
+        {{ invoice_totals|json_script:"invoice_totals" }}
+        {{ paid_invoice_counts|json_script:"paid_invoice_counts" }}
+        {{ payment_status_labels|json_script:"payment_status_labels" }}
+        {{ payment_status_counts|json_script:"payment_status_counts" }}
+        
+    
 
     <footer class="footer pt-3">
       <div class="container-fluid">
@@ -260,77 +256,86 @@
     }
   </style>
 
-  <script>
-    // Show/hide the charts on button click
-    document.getElementById('toggleCharts').addEventListener('click', function() {
-      const chartsContainer = document.getElementById('charts-container');
-      if (chartsContainer.style.display === 'none') {
-        chartsContainer.style.display = 'block';
-        this.textContent = 'Cacher les graphiques';
-      } else {
-        chartsContainer.style.display = 'none';
-        this.textContent = 'Voir les graphiques';
-      }
-    });
+<script>
+  document.getElementById('toggleCharts').addEventListener('click', function() {
+    const chartsContainer = document.getElementById('charts-container');
+    if (chartsContainer.style.display === 'none') {
+      chartsContainer.style.display = 'block';
+      this.textContent = 'Cacher les graphiques';
+    } else {
+      chartsContainer.style.display = 'none';
+      this.textContent = 'Voir les graphiques';
+    }
+  });
 
-    // Graphique des factures créées par mois
-    const labels = JSON.parse(document.getElementById('invoice_labels').textContent);
-    const invoiceTotals = JSON.parse(document.getElementById('invoice_totals').textContent);
+  // Graphique des factures créées et payées par mois
+const labels = JSON.parse(document.getElementById('invoice_labels').textContent);
+const invoiceTotals = JSON.parse(document.getElementById('invoice_totals').textContent);
+const paidInvoiceCounts = JSON.parse(document.getElementById('paid_invoice_counts').textContent);
 
-    const ctx = document.getElementById('invoiceAmountChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
+const ctx = document.getElementById('invoiceAmountChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
         labels: labels,
-        datasets: [{
-          label: 'Total factures créées',
-          data: invoiceTotals,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
+        datasets: [
+            {
+                label: 'Total factures créées',
+                data: invoiceTotals,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Factures payées',
+                data: paidInvoiceCounts,
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
         scales: {
-          y: {
-            beginAtZero: true
-          }
+            y: {
+                beginAtZero: true
+            }
         }
-      }
-    });
+    }
+});
 
-    // Graphique des factures par client
-    const clientLabels = JSON.parse(document.getElementById('client_labels').textContent);
-    const clientTotals = JSON.parse(document.getElementById('client_totals').textContent);
+// Graphique de répartition par statut de paiement
+const paymentStatusLabels = JSON.parse(document.getElementById('payment_status_labels').textContent);
+const paymentStatusCounts = JSON.parse(document.getElementById('payment_status_counts').textContent);
 
-    const ctxClient = document.getElementById('invoiceByClientChart').getContext('2d');
-    new Chart(ctxClient, {
-      type: 'doughnut',  // Changer 'bar' par 'doughnut' pour un graphique circulaire
-      data: {
-        labels: clientLabels,
+const ctxPaymentStatus = document.getElementById('paymentStatusChart').getContext('2d');
+new Chart(ctxPaymentStatus, {
+    type: 'pie',
+    data: {
+        labels: paymentStatusLabels,
         datasets: [{
-          label: 'Montant total des factures par client (en TND)',
-          data: clientTotals,
-          backgroundColor: [
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 99, 132, 0.2)'
-          ],
-          borderColor: [
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)',
-            'rgba(255, 99, 132, 1)'
-          ],
-          borderWidth: 1
+            label: 'Répartition des factures',
+            data: paymentStatusCounts,
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
         }]
-      },
-      options: {
-        responsive: true,
-      }
-    });
-  </script>
+    },
+    options: {
+        responsive: true
+    }
+});
+
+</script>
+
 </body>
 
 </html>

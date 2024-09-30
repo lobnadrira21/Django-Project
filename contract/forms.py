@@ -116,7 +116,6 @@ class InvoiceForm(forms.ModelForm):
         model = Invoice
         fields = [
             'contract',
-            'numero_facture',
             'date_echeance',
             'service_description',
             'montant',
@@ -128,7 +127,7 @@ class InvoiceForm(forms.ModelForm):
             'notes'
         ]
         widgets = {
-            'numero_facture': forms.TextInput(attrs={'class': 'form-control'}),
+            
             'date_echeance': DateInput(attrs={'class': 'form-control'}),
             'service_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'montant': forms.NumberInput(attrs={'class': 'form-control'}),

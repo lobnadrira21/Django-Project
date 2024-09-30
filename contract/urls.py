@@ -27,7 +27,7 @@ urlpatterns = [
     path('invoices/update/<int:pk>/', views.update_invoice, name='update_invoice'),
     path('invoices/delete/<int:pk>/', views.delete_invoice, name='delete_invoice'),
     path('invoices/card-invoices/', views.card_invoices_admin, name='card_invoices'),
-    path('contract/valid_contract', views.invoice_data_view, name='admin_list_contract'),
+    path('contract/valid_contract', views.admin_dashboard, name='admin_list_contract'),
   
 ]
 if settings.DEBUG:

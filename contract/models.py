@@ -1,7 +1,8 @@
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils.timezone import now
+from django.db.models import Max
 
 class Gouvernorat(models.Model):
     nomGouvernorat = models.CharField(max_length=100, unique=True,null=True)
@@ -133,38 +134,62 @@ class Contract(models.Model):
 
 
 
+
+
+
+
 class Invoice(models.Model):
-    contract = models.CharField(max_length=255, blank=True, null=True)
-    numero_facture = models.CharField(max_length=20, unique=True)
+    contract = models.CharField(max_length=255, blank=True)
+    numero_facture = models.CharField(max_length=20, unique=True, blank=True, null=True)
     date_echeance = models.DateField() 
     service_description = models.TextField()
     montant = models.DecimalField(max_digits=10, decimal_places=2)
     taux_tva = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     tva_montant = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-
     total_montant = models.DecimalField(max_digits=10, decimal_places=2)
     status_paiement = models.CharField(max_length=50, choices=[('paid', 'Paid'), ('unpaid', 'Unpaid')], blank=True, null=True)
-   
-       
     methode_paiement = models.CharField(max_length=50, choices=[('cash', 'Cash'), ('card', 'Card')], blank=True, null=True)
-
     notes = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"Invoice {self.numero_facture} for contract {self.contract.id}"
+        return f"Invoice {self.numero_facture} for contract {self.contract}"
 
     def save(self, *args, **kwargs):
         # Assurez-vous que `montant` et `taux_tva` ne sont pas None
         montant = self.montant if self.montant is not None else Decimal('0.00')
-        taux_tva = self.taux_tva if self.taux_tva is not None else Decimal('0.19')  # ou la valeur par défaut souhaitée
+        taux_tva = self.taux_tva if self.taux_tva is not None else Decimal('0.19')
 
         # Calcul du montant de la TVA et du montant total
         self.tva_montant = montant * taux_tva
         self.total_montant = montant + self.tva_montant
 
+        # Génération du numéro de facture si non présent
+        if not self.numero_facture:
+            current_date = now()
+            year = current_date.year
+            month = current_date.month
+
+            # Récupérer le plus grand numéro de facture pour l'année et le mois en cours
+            last_invoice = Invoice.objects.filter(
+                numero_facture__startswith=f"{year}{month:02}"
+            ).aggregate(largest_num=Max('numero_facture'))
+
+            if last_invoice['largest_num']:
+                # Extraire les 3 derniers chiffres et incrémenter
+                last_number = int(last_invoice['largest_num'][-3:])  # Récupère les 3 derniers chiffres
+                new_number = last_number + 1
+            else:
+                new_number = 1  # Première facture du mois
+
+            # Formater le numéro de facture : YYYYMM-XXX
+            self.numero_facture = f"{year}{month:02}-{new_number:03}"
+
         super(Invoice, self).save(*args, **kwargs)
+
+
 
 
     
